@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitation</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: hsl(293, 88%, 48%);
+            font-family: Arial, sans-serif;
+        }
+
+        .carte {
+            background: linear-gradient(135deg, #ff6ec7, hsl(272, 58%, 51%));
+            color: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 25px #e4159499;
+            text-align: center;
+            width: 320px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        .boutons {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .bouton {
+            padding: 12px 30px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #ff3fa4;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #bouton-non {
+            background: #4b1c5c;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        input[type="date"] {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        #resultat {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .cache {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="carte">
+
+        <!-- ETAPE 1 : la question -->
+        <div id="etape1">
+            <h1>Veux-tu sortir avec moi ?</h1>
+            <div class="boutons">
+                <button class="bouton" id="bouton-oui">Oui</button>
+                <button class="bouton" id="bouton-non">Non</button>
+            </div>
+        </div>
+
+        <!-- ETAPE 2 : l'invitation et la date -->
+        <div id="etape2" class="cache">
+            <h1>Madame KADI voulez-vous m'accompagnee </h1>
+            <p>a un rendez-vous, le jour de votre choix</p>
+            <label>Choisis le jour :</label><br>
+            <input type="date" id="date">
+            <p id="resultat"></p>
+            <button class="bouton" id="bouton-suite2">Suivant</button>
+        </div>
+
+        <!-- ETAPE 3 : la confirmation -->
+        <div id="etape3" class="cache">
+            <h1>Vous etes invitee !</h1>
+            <p>Faites-vous belle, pour le <span id="rappel-date"></span>.</p>
+            <button class="bouton" id="bouton-envoyer">Envoyer</button>
+        </div>
+
+        <!-- ETAPE 4 : la reponse -->
+        <div id="etape4" class="cache">
+            <h1>C'est accepte !</h1>
+            <p>Elle a repondu oui. Rendez-vous le <span id="date-finale"></span>.</p>
+        </div>
+
+    </div>
+
+    <script>
+        const boutonOui = document.getElementById("bouton-oui");
+        const boutonNon = document.getElementById("bouton-non");
+        const boutonSuite2 = document.getElementById("bouton-suite2");
+        const boutonEnvoyer = document.getElementById("bouton-envoyer");
+        const inputDate = document.getElementById("date");
+        const resultat = document.getElementById("resultat");
+        const rappelDate = document.getElementById("rappel-date");
+        const dateFinale = document.getElementById("date-finale");
+
+        // Affiche l'etape demandee et cache les autres
+        function allerA(numero) {
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById("etape" + i).classList.add("cache");
+            }
+            document.getElementById("etape" + numero).classList.remove("cache");
+        }
+
+        // Formate une date en francais
+        function formaterDate(valeur) {
+            const date = new Date(valeur + "T00:00:00");
+            return date.toLocaleDateString("fr-FR", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
+        }
+
+        // Etape 1 : Oui passe a l'etape 2
+        boutonOui.addEventListener("click", function () {
+            allerA(2);
+        });
+
+        // Etape 1 : le bouton Non fuit la souris, puis disparait
+        let essais = 0;
+        boutonNon.addEventListener("mouseover", function () {
+            essais++;
+            if (essais > 5) {
+                boutonNon.style.display = "none";
+                return;
+            }
+            const x = Math.random() * 300 - 150;
+            const y = Math.random() * 300 - 150;
+            boutonNon.style.transform = `translate(${x}px, ${y}px)`;
+        });
+
+        // Etape 2 : affiche la date choisie
+        inputDate.addEventListener("change", function () {
+            resultat.textContent = "Rendez-vous le " + formaterDate(inputDate.value);
+        });
+
+        // Etape 2 : Suivant passe a l'etape 3 avec la date
+        boutonSuite2.addEventListener("click", function () {
+            if (!inputDate.value) {
+                resultat.textContent = "Choisis d'abord un jour !";
+                return;
+            }
+            rappelDate.textContent = formaterDate(inputDate.value);
+            allerA(3);
+        });
+
+        // Etape 3 : Envoyer passe a l'etape 4 (l'acceptation)
+        boutonEnvoyer.addEventListener("click", function () {
+            dateFinale.textContent = formaterDate(inputDate.value);
+            allerA(4);
+        });
+    </script>
+</body>
+
+</html>
